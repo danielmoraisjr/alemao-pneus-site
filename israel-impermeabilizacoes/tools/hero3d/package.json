@@ -1,0 +1,7 @@
+{
+  "name": "israel-hero3d",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "esbuild src/hero3d.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/js/hero3d.js" },
+  "devDependencies": { "esbuild": "^0.25.0", "three": "^0.170.0" }
+}

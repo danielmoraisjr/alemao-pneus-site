@@ -256,6 +256,30 @@
   .tile .ico { background: #041a3399; }
   .tile .tag3d { display: inline-block; background: var(--yellow); color: var(--navy-950); font-size: .7rem; font-weight: 800; padding: 0 6px; border-radius: 4px; margin-left: 4px; vertical-align: 2px; }
 
+  /* ===== Janela de detalhes do serviço ===== */
+  .sd { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
+  .sd[hidden] { display: none; }
+  .sd-bg { position: absolute; inset: 0; background: #020c19b3; opacity: 0; transition: opacity .3s var(--ease); }
+  .sd-card { position: relative; width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; overflow: auto; overscroll-behavior: contain; background: #fff; color: var(--ink); border-radius: 20px 20px 0 0; box-shadow: 0 -20px 60px -20px #000c; transform: translateY(40px); opacity: 0; transition: transform .35s var(--ease), opacity .3s var(--ease); }
+  .sd.on .sd-bg { opacity: 1; } .sd.on .sd-card { transform: none; opacity: 1; }
+  @media (min-width: 700px) { .sd { align-items: center; padding: 24px; } .sd-card { border-radius: 20px; max-height: 88vh; } }
+  .sd-media { position: relative; aspect-ratio: 16 / 10; background: var(--navy-950); overflow: hidden; }
+  .sd-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .sd-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #041a3300 45%, #041a33e6 100%); }
+  .sd-head { position: absolute; left: 20px; right: 20px; bottom: 16px; z-index: 1; display: flex; align-items: center; gap: 12px; color: #fff; }
+  .sd-head svg { width: 40px; height: 40px; flex: none; padding: 7px; border-radius: 10px; border: 1.5px solid var(--yellow); background: #041a3399; fill: none; stroke: var(--yellow); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .sd-head h3 { font-family: var(--display); font-weight: 800; font-size: clamp(1.35rem, 5vw, 1.7rem); line-height: 1.05; }
+  .sd-x { position: absolute; top: 12px; right: 12px; z-index: 2; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #041a33b3; color: #fff; font-size: 1.5rem; line-height: 1; cursor: pointer; }
+  .sd-body { padding: 18px 20px 22px; display: grid; gap: 14px; }
+  .sd-body h4 { font-size: .74rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--navy-700); margin-bottom: 4px; }
+  .sd-body p { color: var(--muted); line-height: 1.5; }
+  .sd-body ul { list-style: none; display: grid; gap: 8px; }
+  .sd-body li { position: relative; padding-left: 28px; line-height: 1.4; }
+  .sd-body li::before { content: ""; position: absolute; left: 0; top: 1px; width: 19px; height: 19px; border-radius: 50%; background: var(--yellow) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23041a33' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 13px no-repeat; }
+  .sd-when { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--line); font-size: .93rem; line-height: 1.4; }
+  .sd-when svg { width: 20px; height: 20px; flex: none; margin-top: 1px; fill: none; stroke: var(--navy-700); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sd .btn { width: 100%; margin: 2px 0 0; min-height: 52px; font-size: 1.02rem; }
+  .sd .btn svg { width: 20px; height: 20px; }
   /* ===== Faixas socorro / WhatsApp ===== */
   .bands { display: grid; gap: 14px; }
 
@@ -710,6 +734,20 @@
   <a href="https://www.google.com/maps/search/?api=1&query=Alem%C3%A3o+Pneus+Av.+Mal.+Floriano+Peixoto+350+Botucatu" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Rota</a>
 </nav>
 
+<!-- Janela de detalhes do serviço -->
+<div class="sd" id="svcDlg" hidden>
+  <div class="sd-bg" data-close></div>
+  <div class="sd-card" role="dialog" aria-modal="true" aria-labelledby="sdTitle">
+    <button class="sd-x" type="button" aria-label="Fechar" data-close>×</button>
+    <div class="sd-media"><img id="sdImg" alt="" width="1440" height="900"><div class="sd-head"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="sdIco" d=""/></svg><h3 id="sdTitle"></h3></div></div>
+    <div class="sd-body">
+      <div><h4>O que é</h4><p id="sdO"></p></div>
+      <div><h4>Por que é importante</h4><ul id="sdP"></ul></div>
+      <div class="sd-when"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b>Quando fazer:</b> <span id="sdQ"></span></span></div>
+      <a class="btn btn-g arrow" id="sdBtn" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>Solicitar este serviço</a>
+    </div>
+  </div>
+</div>
 <!-- ================= Configurações fáceis de editar ================= -->
 <script>
   const WHATSAPP = '5514997987912';
@@ -906,11 +944,131 @@
 
   // Serviços
   $('svcGrid').innerHTML = SERVICOS.map((s, i) => `
-    <a class="tile" href="${wa(`Olá, Alemão! Quero saber sobre ${s.nome.toLowerCase()}${s.tag ? ' ' + s.tag : ''}.`)}" target="_blank" rel="noopener">
+    <a class="tile" data-i="${i}" href="${wa(`Olá, Alemão! Quero saber sobre ${s.nome.toLowerCase()}${s.tag ? ' ' + s.tag : ''}.`)}" target="_blank" rel="noopener" aria-haspopup="dialog">
       <img class="bg" src="${FOTOS[i]}" alt="" width="720" height="450" loading="lazy" decoding="async">
       <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="${s.ic}"/></svg>
       <span>${s.nome}${s.tag ? `<em class="tag3d">${s.tag}</em>` : ''}</span>
     </a>`).join('');
+
+  // Detalhes de cada serviço (mesma ordem de SERVICOS): o que é, por que fazer, quando fazer e a mensagem do WhatsApp
+  const INFO = [
+    { o: 'Substituição dos pneus gastos ou danificados por pneus novos, com montagem, válvula nova e balanceamento das rodas.',
+      p: ['Pneu com sulco abaixo de 1,6 mm é proibido por lei (CONTRAN) e dá multa grave.', 'Com a borracha gasta, o carro demora mais para frear, principalmente na chuva.', 'Pneu novo segura melhor nas curvas e diminui o risco de aquaplanagem.'],
+      q: 'Quando o indicador de desgaste (TWI) aparecer, ou se houver bolha, corte ou ressecamento.',
+      m: 'Olá, Alemão! Quero fazer a troca de pneus. Podem me passar o preço e as marcas disponíveis?' },
+    { o: 'Ajuste dos ângulos das rodas (convergência, cambagem e cáster) com equipamento 3D, para o carro andar reto e os pneus tocarem o chão do jeito certo.',
+      p: ['Evita que o carro "puxe" para um lado e o volante fique torto.', 'Faz os pneus gastarem por igual e durarem mais.', 'Deixa a direção mais firme e segura, inclusive em velocidade.'],
+      q: 'A cada 10 mil km, na troca de pneus ou depois de bater a roda em buraco ou guia.',
+      m: 'Olá, Alemão! Quero fazer o alinhamento 3D. Qual o valor e quando posso levar o carro?' },
+    { o: 'Correção do peso de cada conjunto de roda e pneu em máquina computadorizada, colocando pequenos contrapesos onde é preciso.',
+      p: ['Acaba com a trepidação no volante e no banco em velocidade.', 'Evita desgaste irregular dos pneus.', 'Poupa rolamentos, amortecedores e peças da suspensão.'],
+      q: 'A cada 10 mil km, na troca ou conserto de pneu, ou se o volante tremer.',
+      m: 'Olá, Alemão! Quero fazer o balanceamento das rodas. Qual o valor?' },
+    { o: 'Diagnóstico e conserto de motor, câmbio, embreagem, arrefecimento e demais sistemas do carro, em todas as marcas.',
+      p: ['Um barulho ou luz no painel, quando resolvido cedo, sai bem mais barato.', 'Evita que o carro deixe você na mão na rua ou na estrada.', 'Mantém o consumo de combustível e o desempenho em dia.'],
+      q: 'Ao notar barulho diferente, vazamento, luz acesa no painel ou perda de força.',
+      m: 'Olá, Alemão! Meu carro está precisando de mecânica. Posso explicar o problema e ver um orçamento?' },
+    { o: 'Revisão e troca de pastilhas, lonas, discos, tambores e fluido de freio.',
+      p: ['Freio em dia é o que faz o carro parar a tempo, sem susto.', 'Pastilha gasta risca o disco e deixa o conserto mais caro.', 'Fluido velho absorve umidade e perde eficiência na frenagem.'],
+      q: 'Revisar a cada 10 mil km, ou ao ouvir chiado, sentir o pedal baixo ou o carro puxar ao frear.',
+      m: 'Olá, Alemão! Quero revisar os freios do meu carro. Qual o valor?' },
+    { o: 'Troca do óleo do motor e dos filtros de óleo, ar, combustível e cabine, seguindo o que o manual do carro pede.',
+      p: ['O óleo lubrifica e protege o motor contra desgaste.', 'Óleo vencido perde a proteção e pode causar danos sérios ao motor.', 'Filtros limpos ajudam no consumo e no ar dentro do carro.'],
+      q: 'Conforme o manual do veículo, normalmente entre 5 e 10 mil km ou uma vez por ano.',
+      m: 'Olá, Alemão! Quero fazer a troca de óleo e filtros. Qual o valor para o meu carro?' },
+    { o: 'Teste da bateria e do sistema de carga (alternador) e troca da bateria quando necessário.',
+      p: ['Evita que o carro não dê partida na hora que você mais precisa.', 'Uma bateria fraca pode prejudicar a parte elétrica e os módulos.', 'O teste mostra se o problema é a bateria ou o alternador.'],
+      q: 'A partir de 2 anos de uso, ou se a partida estiver mais fraca.',
+      m: 'Olá, Alemão! Quero testar ou trocar a bateria do meu carro. Qual o valor?' },
+    { o: 'Revisão de buchas, pivôs, terminais, bandejas, caixa de direção e demais peças que ligam as rodas ao carro.',
+      p: ['Deixa o carro estável nas curvas e na frenagem.', 'Acaba com barulhos e folgas nas lombadas e buracos.', 'Peças boas evitam desgaste irregular dos pneus.'],
+      q: 'Ao ouvir barulhos ao passar em buracos, sentir folga no volante ou o carro instável.',
+      m: 'Olá, Alemão! Quero revisar a suspensão e a direção do meu carro. Qual o valor?' },
+    { o: 'Limpeza, higienização, carga de gás e conserto do sistema de ar-condicionado.',
+      p: ['Ar gelando de verdade nos dias quentes de Botucatu.', 'A higienização elimina fungos, bactérias e mau cheiro.', 'Um sistema em dia gasta menos combustível para gelar.'],
+      q: 'Higienização e filtro de cabine uma vez por ano, ou se o ar não gelar ou tiver cheiro.',
+      m: 'Olá, Alemão! Quero fazer a manutenção do ar-condicionado. Qual o valor?' },
+    { o: 'Conserto e troca de escapamento, silencioso, catalisador e coxins.',
+      p: ['Acaba com o barulho alto e vibrações embaixo do carro.', 'Evita que gases entrem na cabine.', 'Escapamento furado pode dar multa e prejudicar o desempenho.'],
+      q: 'Se o ronco aumentar, aparecer barulho de lata solta ou cheiro de fumaça.',
+      m: 'Olá, Alemão! Quero ver o escapamento do meu carro. Podem fazer um orçamento?' },
+    { o: 'Verificação geral do carro: óleo, filtros, freios, suspensão, pneus, bateria, luzes e fluidos, em um único check-up.',
+      p: ['Encontra pequenos problemas antes de virarem um prejuízo grande.', 'Ideal antes de viajar ou de vender o carro.', 'Ajuda a manter o valor do carro na hora da revenda.'],
+      q: 'Uma vez por ano ou a cada 10 mil km, e sempre antes de viagens.',
+      m: 'Olá, Alemão! Quero fazer uma revisão completa no meu carro. Qual o valor?' },
+    { o: 'Diagnóstico com scanner, limpeza de bicos injetores e conserto do sistema que controla a mistura de ar e combustível.',
+      p: ['Acaba com falhas, trancos e marcha lenta irregular.', 'Melhora o consumo de combustível.', 'Apaga a luz de injeção resolvendo a causa, não só o sintoma.'],
+      q: 'Quando a luz da injeção acender, o carro falhar ou o consumo aumentar.',
+      m: 'Olá, Alemão! Meu carro está com problema na injeção eletrônica. Podem fazer o diagnóstico?' },
+    { o: 'Diagnóstico e reparo de módulos eletrônicos (injeção, ABS, airbag, painel e outros), sem precisar trocar a peça inteira.',
+      p: ['O reparo costuma sair bem mais barato que um módulo novo.', 'Resolve luzes no painel e funções que pararam de funcionar.', 'Devolve o funcionamento correto dos sistemas de segurança.'],
+      q: 'Quando aparecerem luzes de alerta, falhas elétricas ou funções que pararam.',
+      m: 'Olá, Alemão! Preciso de reparo em módulo eletrônico. Podem avaliar?' },
+    { o: 'Reparo de furos e pequenos danos no pneu, com remendo feito por dentro, no lugar certo.',
+      p: ['Um furo bem consertado deixa o pneu seguro de novo.', 'Economiza a compra de um pneu novo.', 'Evita perder pressão aos poucos e estragar o pneu rodando murcho.'],
+      q: 'Assim que notar prego, parafuso ou o pneu baixando de pressão.',
+      m: 'Olá, Alemão! Meu pneu furou e quero consertar. Posso levar agora?' },
+    { o: 'Desempeno e reparo de rodas amassadas ou tortas, de ferro ou de liga leve.',
+      p: ['Roda torta faz o carro trepidar e gasta pneu.', 'Pode causar vazamento de ar no pneu.', 'O reparo sai mais barato que uma roda nova.'],
+      q: 'Depois de bater em buraco ou guia, ou se o volante trepidar mesmo com balanceamento.',
+      m: 'Olá, Alemão! Minha roda amassou ou entortou. Podem avaliar o conserto?' },
+    { o: 'Troca dos pneus de posição entre as rodas da frente e de trás, para gastarem por igual.',
+      p: ['Os pneus da frente gastam mais rápido; o rodízio equilibra isso.', 'Aumenta a vida útil do jogo de pneus.', 'Permite trocar os quatro juntos, mantendo o carro equilibrado.'],
+      q: 'A cada 8 a 10 mil km, ou como indica o manual do carro.',
+      m: 'Olá, Alemão! Quero fazer o rodízio dos pneus. Qual o valor?' },
+    { o: 'Avaliação e troca de amortecedores, molas, batentes e coxins.',
+      p: ['Amortecedor bom mantém o pneu colado no chão.', 'Reduz a distância de frenagem e evita que o carro balance.', 'Deixa o carro mais confortável nas ruas e na estrada.'],
+      q: 'Avaliar a cada 10 mil km; trocar quando houver vazamento, barulho ou o carro balançar muito.',
+      m: 'Olá, Alemão! Quero avaliar os amortecedores do meu carro. Qual o valor?' },
+    { o: 'Reparo de cortes e danos maiores no pneu com borracha vulcanizada a quente, que se une ao pneu.',
+      p: ['Recupera pneus que não teriam conserto com remendo simples.', 'O reparo fica firme e durável.', 'Economia em relação a um pneu novo, quando o dano permite.'],
+      q: 'Quando o pneu tiver corte ou dano que precise de um reparo mais forte.',
+      m: 'Olá, Alemão! Preciso de vulcanização em um pneu. Podem avaliar?' },
+    { o: 'Todos os serviços de pneu em um só lugar: montagem, desmontagem, conserto, válvulas, calibragem e câmaras.',
+      p: ['Resolve tudo de pneu de uma vez, com rapidez.', 'Equipamento certo evita danos à roda e ao pneu.', 'Equipe experiente, há mais de 30 anos em Botucatu.'],
+      q: 'Sempre que precisar de qualquer serviço no pneu.',
+      m: 'Olá, Alemão! Preciso de um serviço de borracharia. Posso levar o carro?' },
+    { o: 'Pneus novos das principais marcas, para carros, SUVs e caminhonetes, com a medida certa para o seu veículo.',
+      p: ['Opções para todo bolso, do econômico ao premium.', 'A medida certa garante segurança e o velocímetro correto.', 'Você sai com o pneu montado, balanceado e alinhado.'],
+      q: 'Na hora de trocar os pneus, compare as opções com a gente.',
+      m: 'Olá, Alemão! Quero ver as marcas e preços de pneus para o meu carro.' },
+    { o: 'Verificação e ajuste da pressão dos pneus, inclusive o estepe, conforme o indicado pela montadora.',
+      p: ['Pneu murcho gasta mais combustível e desgasta nas bordas.', 'Pressão certa melhora a frenagem e a estabilidade.', 'Aumenta a vida útil dos pneus.'],
+      q: 'A cada 15 dias, sempre com o pneu frio, e antes de viajar.',
+      m: 'Olá, Alemão! Quero calibrar os pneus. Posso passar aí?' },
+  ];
+  // Ao tocar num serviço: abre a explicação com a foto e o botão de solicitar
+  (() => {
+    const dlg = $('svcDlg'), img = $('sdImg'); let last = null;
+    const abrir = i => {
+      const s = SERVICOS[i], d = INFO[i]; if (!s || !d) return;
+      last = document.activeElement;
+      img.src = FOTOS[i];
+      const hd = new Image(); hd.onload = () => { if (dlg.dataset.i == i) img.src = hd.src; }; hd.src = `img/servicos/${String(i).padStart(2, '0')}.webp`;
+      dlg.dataset.i = i;
+      $('sdIco').setAttribute('d', s.ic);
+      $('sdTitle').textContent = s.nome + (s.tag ? ' ' + s.tag : '');
+      $('sdO').textContent = d.o;
+      $('sdP').innerHTML = ''; d.p.forEach(t => { const li = document.createElement('li'); li.textContent = t; $('sdP').append(li); });
+      $('sdQ').textContent = d.q;
+      $('sdBtn').href = wa(d.m);
+      dlg.hidden = false; document.documentElement.style.overflow = 'hidden';
+      dlg.querySelector('.sd-card').scrollTop = 0;
+      requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('on')));
+      dlg.querySelector('.sd-x').focus({ preventScroll: true });
+    };
+    const fechar = () => {
+      dlg.classList.remove('on'); document.documentElement.style.overflow = '';
+      setTimeout(() => { dlg.hidden = true; }, calm ? 0 : 300);
+      if (last) last.focus({ preventScroll: true });
+    };
+    $('svcGrid').addEventListener('click', e => {
+      const t = e.target.closest('.tile'); if (!t) return;
+      e.preventDefault(); abrir(+t.dataset.i);
+    });
+    dlg.addEventListener('click', e => { if (e.target.closest('[data-close]')) fechar(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !dlg.hidden) fechar(); });
+  })();
 
   // Carrossel de serviços: efeito 3D ao deslizar, setas, barra e "ver todos"
   (() => {

@@ -232,7 +232,7 @@
   @media (min-width: 640px) { .svc-grid { grid-auto-columns: 42%; } }
   @media (min-width: 1000px) { .svc-wrap { margin: 0; } .svc-grid { grid-template-rows: repeat(3, 150px); grid-auto-columns: calc((100% - 24px) / 3); padding: 6px 0 14px; scroll-padding: 0; } }
   .svc-grid .tile { scroll-snap-align: start; min-height: 0; transform: rotateY(var(--ry, 0deg)) scale(var(--sc, 1)); transform-origin: var(--to, center); transition: transform .35s var(--ease), box-shadow .25s; will-change: transform; }
-  .svc-grid .tile:hover { transform: rotateY(0) scale(1.02); box-shadow: 0 18px 30px -18px #041a33; }
+  @media (hover: hover) and (pointer: fine) { .svc-grid .tile:hover { transform: rotateY(0) scale(1.02); box-shadow: 0 18px 30px -18px #041a33; } }
   .svc-wrap.all { perspective: none; }
   .svc-wrap.all .svc-grid { grid-auto-flow: row; grid-template-rows: none; grid-auto-rows: 150px; grid-template-columns: repeat(2, 1fr); overflow: visible; }
   @media (min-width: 760px) { .svc-wrap.all .svc-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -244,13 +244,13 @@
   .svc-bar i { display: block; height: 100%; width: 30%; border-radius: 4px; background: var(--yellow); transition: transform .2s linear; }
   .svc-wrap.all + .svc-foot .svc-bar { visibility: hidden; }
   .tile { position: relative; overflow: hidden; display: flex; align-items: flex-end; gap: 10px; min-height: 124px; padding: 14px; border-radius: 12px; border: 0; text-align: left; color: #fff; text-decoration: none; background: radial-gradient(120% 120% at 100% 0%, var(--navy-700) 0%, var(--navy-900) 55%, var(--navy-950) 100%); transition: transform .25s var(--ease), box-shadow .25s; }
-  .tile:hover { transform: translateY(-3px); box-shadow: 0 18px 30px -18px #041a33; }
+  @media (hover: hover) and (pointer: fine) { .tile:hover { transform: translateY(-3px); box-shadow: 0 18px 30px -18px #041a33; } }
   .tile .big { position: absolute; right: -14px; top: -14px; width: 104px; height: 104px; fill: none; stroke: #ffffff; stroke-opacity: .13; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; transition: transform .4s var(--ease), stroke-opacity .3s; }
-  .tile:hover .big { transform: rotate(-8deg) scale(1.06); stroke-opacity: .22; }
+  @media (hover: hover) and (pointer: fine) { .tile:hover .big { transform: rotate(-8deg) scale(1.06); stroke-opacity: .22; } }
   .tile .ico { width: 30px; height: 30px; flex: none; padding: 5px; border-radius: 8px; border: 1.5px solid var(--yellow); fill: none; stroke: var(--yellow); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
   .tile span { position: relative; min-width: 0; font-weight: 700; font-size: 1rem; line-height: 1.15; }
   .tile .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
-  .tile:hover .bg { transform: scale(1.06); }
+  @media (hover: hover) and (pointer: fine) { .tile:hover .bg { transform: scale(1.06); } }
   .tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #041a3310 20%, #041a33cc 72%, #041a33f2 100%); }
   .tile .ico, .tile span { z-index: 1; }
   .tile .ico { background: #041a3399; }
@@ -259,7 +259,7 @@
   /* ===== Janela de detalhes do serviço ===== */
   .sd { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; }
   .sd[hidden] { display: none; }
-  .sd-bg { position: absolute; inset: 0; background: #020c19b3; opacity: 0; transition: opacity .3s var(--ease); }
+  .sd-bg { position: absolute; inset: 0; touch-action: none; background: #020c19b3; opacity: 0; transition: opacity .3s var(--ease); }
   .sd-card { position: relative; width: 100%; max-width: 560px; max-height: 92vh; max-height: 92dvh; overflow: auto; overscroll-behavior: contain; background: #fff; color: var(--ink); border-radius: 20px 20px 0 0; box-shadow: 0 -20px 60px -20px #000c; transform: translateY(40px); opacity: 0; transition: transform .35s var(--ease), opacity .3s var(--ease); }
   .sd.on .sd-bg { opacity: 1; } .sd.on .sd-card { transform: none; opacity: 1; }
   @media (min-width: 700px) { .sd { align-items: center; padding: 24px; } .sd-card { border-radius: 20px; max-height: 88vh; } }
@@ -1039,10 +1039,10 @@
   ];
   // Ao tocar num serviço: abre a explicação com a foto e o botão de solicitar
   (() => {
-    const dlg = $('svcDlg'), img = $('sdImg'); let last = null;
+    const dlg = $('svcDlg'), img = $('sdImg'), grid = $('svcGrid'); let last = null, teclado = false, pos = 0;
     const abrir = i => {
       const s = SERVICOS[i], d = INFO[i]; if (!s || !d) return;
-      last = document.activeElement;
+      last = document.activeElement; pos = grid.scrollLeft;
       img.src = FOTOS[i];
       const hd = new Image(); hd.onload = () => { if (dlg.dataset.i == i) img.src = hd.src; }; hd.src = `img/servicos/${String(i).padStart(2, '0')}.webp`;
       dlg.dataset.i = i;
@@ -1052,19 +1052,20 @@
       $('sdP').innerHTML = ''; d.p.forEach(t => { const li = document.createElement('li'); li.textContent = t; $('sdP').append(li); });
       $('sdQ').textContent = d.q;
       $('sdBtn').href = wa(d.m);
-      dlg.hidden = false; document.documentElement.style.overflow = 'hidden';
+      dlg.hidden = false;
       dlg.querySelector('.sd-card').scrollTop = 0;
       requestAnimationFrame(() => requestAnimationFrame(() => dlg.classList.add('on')));
-      dlg.querySelector('.sd-x').focus({ preventScroll: true });
+      if (teclado) dlg.querySelector('.sd-x').focus({ preventScroll: true });
     };
     const fechar = () => {
-      dlg.classList.remove('on'); document.documentElement.style.overflow = '';
-      setTimeout(() => { dlg.hidden = true; }, calm ? 0 : 300);
-      if (last) last.focus({ preventScroll: true });
+      dlg.classList.remove('on');
+      setTimeout(() => { dlg.hidden = true; if (grid.scrollLeft !== pos) grid.scrollLeft = pos; }, calm ? 0 : 300);
+      if (teclado && last) last.focus({ preventScroll: true });
+      else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     };
     $('svcGrid').addEventListener('click', e => {
       const t = e.target.closest('.tile'); if (!t) return;
-      e.preventDefault(); abrir(+t.dataset.i);
+      e.preventDefault(); teclado = e.detail === 0; abrir(+t.dataset.i);
     });
     dlg.addEventListener('click', e => { if (e.target.closest('[data-close]')) fechar(); });
     addEventListener('keydown', e => { if (e.key === 'Escape' && !dlg.hidden) fechar(); });
